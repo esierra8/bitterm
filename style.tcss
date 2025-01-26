@@ -1,0 +1,4 @@
+#balance_display {
+  margin-top: 1;
+  color: green;
+}
