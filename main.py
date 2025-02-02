@@ -14,10 +14,14 @@ class BtcWalletManagement(App):
         yield Header()
         yield Container(
             Input(placeholder="Enter Bitcoin Public Address", id="btc_address"),
-            Button("Check Balance", id="check_balance"),
+            Button("View Balance", id="check_balance"),
             Static("balance will be displayed here.", id="balance_display"),
         )
         yield Footer()
+
+    def on_mount(self) -> None:
+        self.title = "Bitcoin Door"
+        self.sub_title = "Open to the Bitcoin Network and real understanding."
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Handle button press events."""
@@ -29,6 +33,7 @@ class BtcWalletManagement(App):
         address_input = self.query_one("#btc_address", Input)
         address = address_input.value.strip()
 
+        # TODO: Validate Bitcoin address to match all bitcoin addresses.
         if not address:
             self.update_balance_display("Please enter a valid Bitcoin address.")
             return
