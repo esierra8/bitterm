@@ -45,11 +45,25 @@ class BtcWalletManagement(App):
         
     def get_btc_balance(self, address: str) -> float:
         """Feth the balance of a Bitcoin address using the blockchain.info API."""
-        url = f"https://blockchain.info/q/addressbalance/{address}"
-        response = requests.get(url)
-        response.raise_for_status()
-        satoshis = int(response.text)
-        return satoshis / 100_000_000
+        try:
+            url = f"https://blockchain.info/q/addressbalance/{address}"
+            response = requests.get(url, timeout=5)
+            response.raise_for_status()
+            satoshis = int(response.text)
+            return satoshis / 100_000_000
+        except requests.exceptions.HTTPError as http_err:
+            if response.status_code == 404:
+                raise Exception(f"HTTP - 404. The public wallet: {address} was not found.")
+            else:
+                raise Exception(f"HTTP error: {http_err}")
+        except requests.exceptions.ConnectionError as conn_err:
+            raise Exception(f"Connection error: {conn_err}")
+        except requests.exceptions.Timeout as timeout_err:
+            raise Exception(f"Request timed out: {timeout_err}")
+        except requests.exceptions.RequestException as req_err:
+            raise Exception(f"Request failed: {req_err}")
+        except ValueError as json_err:
+            raise Exception(f"Invalid response: {json_err}")
 
     def update_balance_display(self, message: str) -> None:
         """Update the balance display widget."""
