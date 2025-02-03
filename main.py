@@ -23,6 +23,11 @@ class BtcWalletManagement(App):
         self.title = "Bitcoin Door"
         self.sub_title = "Open to the Bitcoin Network and real understanding."
 
+    def on_input_submitted(self, event: Input.Submitted) -> None:
+        """Handle Enter key press only for the specific input"""
+        if event.input.id == "btc_address":
+            self.check_balance()
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Handle button press events."""
         if event.button.id == "check_balance":
