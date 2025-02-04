@@ -1,3 +1,4 @@
+from bitcoin_address_validator import BitcoinAddressValidator
 import requests
 from textual.app import App, ComposeResult
 from textual.containers import Container
@@ -39,8 +40,8 @@ class BtcWalletManagement(App):
         address = address_input.value.strip()
 
         # TODO: Validate Bitcoin address to match all bitcoin addresses.
-        if not address:
-            self.update_balance_display("Please enter a valid Bitcoin address.")
+        if not address or not BitcoinAddressValidator.is_valid(address):
+            self.update_balance_display("Bitcoin public address is not valid.")
             return
         try:
             balance = self.get_btc_balance(address)
