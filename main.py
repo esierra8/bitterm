@@ -1,7 +1,8 @@
-from bitcoin_address_validator import BitcoinAddressValidator
 import requests
+from bitcoin_wallet_generation import BitcoinKeyCreation 
+from bitcoin_address_validator import BitcoinAddressValidator
 from textual.app import App, ComposeResult
-from textual.containers import Container
+from textual.containers import Container, Horizontal, Vertical
 from textual.widgets import Footer, Header, Input, Button, Static
 
 class BtcWalletManagement(App):
@@ -15,7 +16,10 @@ class BtcWalletManagement(App):
         yield Header()
         yield Container(
             Input(placeholder="Enter Bitcoin Public Address", id="btc_address"),
-            Button("View Balance", id="check_balance"),
+            Horizontal(
+                Button("View Balance", id="check_balance"),
+                Button("Create private key", id="create_private_key"),
+            ),
             Static("balance will be displayed here.", id="balance_display"),
         )
         yield Footer()
@@ -34,6 +38,9 @@ class BtcWalletManagement(App):
         if event.button.id == "check_balance":
             self.check_balance()
 
+        if event.button.id == "create_private_key":
+            self.create_private_key()
+
     def check_balance(self) -> None:
         """Fetch and display the balance of the Bitcoin address."""
         address_input = self.query_one("#btc_address", Input)
@@ -48,6 +55,13 @@ class BtcWalletManagement(App):
             self.update_balance_display(f"Balance: {balance} BTC")
         except Exception as e:
             self.update_balance_display(f"Error: {str(e)}")
+
+    def create_private_key(self):
+        mnemonic, private_key = BitcoinKeyCreation().generate_mnemonic_and_private_key()
+        mess = f"KEY: {private_key} - Mnemonic type: {type(mnemonic)}"
+        self.update_balance_display(mess)
+        pass
+
         
     def get_btc_balance(self, address: str) -> float:
         """Feth the balance of a Bitcoin address using the blockchain.info API."""
