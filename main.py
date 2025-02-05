@@ -58,7 +58,7 @@ class BtcWalletManagement(App):
 
     def create_private_key(self):
         mnemonic, private_key = BitcoinKeyCreation().generate_mnemonic_and_private_key()
-        mess = f"KEY: {private_key} - Mnemonic type: {type(mnemonic)}"
+        mess = f"KEY: {private_key} - Mnemonic: {mnemonic}"
         self.update_balance_display(mess)
         pass
 
