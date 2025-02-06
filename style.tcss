@@ -1,4 +1,33 @@
 #balance_display {
-  margin-top: 1;
-  color: green;
+  margin-top: 0;
+  color: orange;
+}
+
+Input {
+  dock: bottom;
+  align: center middle;
+  width: 90%;
+  margin-bottom: 1;
+}
+
+
+.button-group {
+  height: 50%;
+  margin: 0;
+  padding: 0;
+  width: 50%;
+  align: center middle;
+}
+
+
+Button {
+  width: 50%;
+  margin: 1;
+}
+
+.balance-containers {
+  height: 1fr;
+  border: round #666;
+  padding: 1;
+  margin: 1;
 }
