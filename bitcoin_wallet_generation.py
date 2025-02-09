@@ -7,7 +7,7 @@ class BitcoinKeyCreation():
     def __init__(self):
         self.private_key = None
 
-    def generate_mnemonic_and_private_key():
+    def generate_mnemonic_and_private_key(self):
         # Generate a 12-word mnemonic phrase
         mnemonic = Mnemonic().generate(strength=128)
         print("Mnemonic Phrase:", mnemonic)

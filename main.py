@@ -14,14 +14,13 @@ class BtcWalletManagement(App):
     def compose(self) -> ComposeResult:
         """Create child widgets for the app"""
         yield Header()
-        yield Container(
-            Input(placeholder="Enter Bitcoin Public Address", id="btc_address"),
-            Horizontal(
-                Button("View Balance", id="check_balance"),
-                Button("Create private key", id="create_private_key"),
-            ),
-            Static("balance will be displayed here.", id="balance_display"),
-        )
+        with Vertical():
+            yield Container(
+                Static("Balance will be displayed here.", id="balance_display"),
+                classes="balance-container"
+            )
+            yield Button("Create private key", id="create_private_key")
+            yield Input(placeholder="Enter Bitcoin Public Address", id="btc_address")
         yield Footer()
 
     def on_mount(self) -> None:
@@ -46,7 +45,6 @@ class BtcWalletManagement(App):
         address_input = self.query_one("#btc_address", Input)
         address = address_input.value.strip()
 
-        # TODO: Validate Bitcoin address to match all bitcoin addresses.
         if not address or not BitcoinAddressValidator.is_valid(address):
             self.update_balance_display("Bitcoin public address is not valid.")
             return
@@ -58,7 +56,7 @@ class BtcWalletManagement(App):
 
     def create_private_key(self):
         mnemonic, private_key = BitcoinKeyCreation().generate_mnemonic_and_private_key()
-        mess = f"KEY: {private_key} - Mnemonic type: {type(mnemonic)}"
+        mess = f"KEY: {private_key} - Mnemonic: {mnemonic}"
         self.update_balance_display(mess)
         pass
 
