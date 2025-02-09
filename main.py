@@ -59,7 +59,7 @@ class BtcWalletManagement(App):
         except Exception as e:
             self.update_balance_display(f"Error: {str(e)}")
 
-    def create_private_key(self):
+    def create_private_key(self) -> None:
         mnemonic, private_key = BitcoinKeyCreation().generate_mnemonic_and_private_key()
         mess = f"KEY: {private_key} - Mnemonic: {mnemonic}"
         self.update_balance_display(mess)
