@@ -2,7 +2,7 @@ import requests
 from bitcoin_wallet_generation import BitcoinKeyCreation 
 from bitcoin_address_validator import BitcoinAddressValidator
 from textual.app import App, ComposeResult
-from textual.containers import Container, Horizontal, Vertical
+from textual.containers import Container, Horizontal, Vertical, VerticalScroll
 from textual.widgets import Footer, Header, Input, Button, Static
 
 class BtcWalletManagement(App):
@@ -15,10 +15,9 @@ class BtcWalletManagement(App):
         """Create child widgets for the app"""
         yield Header()
         with Vertical():
-            yield Container(
-                Static("Balance will be displayed here.", id="balance_display"),
-                classes="balance-container"
-            )
+            with VerticalScroll(id="chat_container"):
+                yield Static("Hi this is first message", id="chat_message")
+
             yield Button("Create private key", id="create_private_key")
             yield Input(placeholder="Enter Bitcoin Public Address", id="btc_address")
         yield Footer()
@@ -40,6 +39,12 @@ class BtcWalletManagement(App):
         if event.button.id == "create_private_key":
             self.create_private_key()
 
+    def add_message_to_chat(self, message: Static) -> None:
+        """This will handle adding the message to the chat UI"""
+        verticalScrollContainer = self.query_one("#chat_container", VerticalScroll)
+        verticalScrollContainer.mount(Static("Added message", id="random_message"))
+
+    
     def check_balance(self) -> None:
         """Fetch and display the balance of the Bitcoin address."""
         address_input = self.query_one("#btc_address", Input)
