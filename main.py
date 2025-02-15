@@ -111,11 +111,6 @@ class BtcWalletManagement(App):
         except ValueError as json_err:
             raise Exception(f"Invalid response: {json_err}")
 
-    def update_balance_display(self, message: str) -> None:
-        """Update the balance display widget."""
-        balance_display = self.query_one("#balance_display", Static)
-        balance_display.update(message)
-
     def action_toogle_dark(self) -> None:
         """An action to toggle dark mode."""
         self.theme = (
