@@ -36,7 +36,7 @@ class BtcWalletManagement(App):
         yield Header()
         with Vertical():
             yield VerticalScroll(id="chat_container")
-            yield Button("Create private key", id="create_private_key")
+            yield Button("Create private key", id="create_private_key_button")
             yield Input(placeholder="Enter Bitcoin Public Address", id="user_input")
         yield Footer()
 
@@ -54,7 +54,7 @@ class BtcWalletManagement(App):
         if event.button.id == "send_button":
             self.process_user_input()
 
-        if event.button.id == "create_private_key":
+        if event.button.id == "create_private_key_button":
             self.create_private_key()
 
     def add_message_to_chat(self, message: str, sender: str = "system") -> None:
