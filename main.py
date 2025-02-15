@@ -5,6 +5,26 @@ from textual.app import App, ComposeResult
 from textual.containers import Container, Horizontal, Vertical, VerticalScroll
 from textual.widgets import Footer, Header, Input, Button, Static
 
+
+class ChatMessage(Static):
+    """
+    A chat message widget for displaying chat bubbles.
+
+    Attributes:
+        message (str): The text content of the message.
+        sender (str): The sender identifier (e.g., 'system', 'user', 'bot').
+    """
+    def __init__(self, message: str, sender: str = "system", **kwargs) -> None:
+        # Pass the message text to the parent Static widget
+        super().__init__(message, **kwargs)
+        self.message = message
+        self.sender = sender
+        # Add CSS classes for styling; these can be defined in your style.tcss
+        self.add_class("chat-bubble")
+        self.add_class(sender)
+
+
+
 class BtcWalletManagement(App):
     """A Textual app to manage bitcoin wallets in terminal."""
 
@@ -15,11 +35,9 @@ class BtcWalletManagement(App):
         """Create child widgets for the app"""
         yield Header()
         with Vertical():
-            with VerticalScroll(id="chat_container"):
-                yield Static("Hi this is first message", id="chat_message")
-
+            yield VerticalScroll(id="chat_container")
             yield Button("Create private key", id="create_private_key")
-            yield Input(placeholder="Enter Bitcoin Public Address", id="btc_address")
+            yield Input(placeholder="Enter Bitcoin Public Address", id="user_input")
         yield Footer()
 
     def on_mount(self) -> None:
@@ -28,43 +46,48 @@ class BtcWalletManagement(App):
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         """Handle Enter key press only for the specific input"""
-        if event.input.id == "btc_address":
-            self.check_balance()
+        if event.input.id == "user_input":
+            self.process_user_input()
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Handle button press events."""
-        if event.button.id == "check_balance":
-            self.check_balance()
+        if event.button.id == "send_button":
+            self.process_user_input()
 
         if event.button.id == "create_private_key":
             self.create_private_key()
 
-    def add_message_to_chat(self, message: Static) -> None:
-        """This will handle adding the message to the chat UI"""
-        verticalScrollContainer = self.query_one("#chat_container", VerticalScroll)
-        verticalScrollContainer.mount(Static("Added message", id="random_message"))
+    def add_message_to_chat(self, message: str, sender: str = "system") -> None:
+        """Add a chat message to the chat container."""
+        chat_container = self.query_one("#chat_container", VerticalScroll)
+        chat_msg = ChatMessage(message, sender=sender)
+        chat_container.mount(chat_msg)
 
-    
-    def check_balance(self) -> None:
-        """Fetch and display the balance of the Bitcoin address."""
-        address_input = self.query_one("#btc_address", Input)
-        address = address_input.value.strip()
-
-        if not address or not BitcoinAddressValidator.is_valid(address):
-            self.update_balance_display("Bitcoin public address is not valid.")
-            return
+    def is_bitcoin_address(self, input) -> bool:
+        if not input or not BitcoinAddressValidator.is_valid(input):
+            self.add_message_to_chat("Bitcoin public address is not valid.")
+            return False
         try:
-            balance = self.get_btc_balance(address)
-            self.update_balance_display(f"Balance: {balance} BTC")
+            balance = self.get_btc_balance(input)
+            self.add_message_to_chat(f"Balance: {balance} BTC")
+            return True
         except Exception as e:
-            self.update_balance_display(f"Error: {str(e)}")
+            self.add_message_to_chat(f"Error: {str(e)}")
+            return False
+    
+    def process_user_input(self) -> None:
+        """Fetch and display the balance of the Bitcoin address."""
+        user_input_widget = self.query_one("#user_input", Input)
+        input = user_input_widget.value.strip()
+        self.add_message_to_chat(str(input), sender="user")
+        if not self.is_bitcoin_address(input):
+            return
 
     def create_private_key(self) -> None:
         mnemonic, private_key = BitcoinKeyCreation().generate_mnemonic_and_private_key()
         mess = f"KEY: {private_key} - Mnemonic: {mnemonic}"
-        self.update_balance_display(mess)
+        self.add_message_to_chat(mess)
         pass
-
         
     def get_btc_balance(self, address: str) -> float:
         """Feth the balance of a Bitcoin address using the blockchain.info API."""
@@ -92,7 +115,6 @@ class BtcWalletManagement(App):
         """Update the balance display widget."""
         balance_display = self.query_one("#balance_display", Static)
         balance_display.update(message)
-
 
     def action_toogle_dark(self) -> None:
         """An action to toggle dark mode."""
