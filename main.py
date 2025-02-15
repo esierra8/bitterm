@@ -36,7 +36,7 @@ class BtcWalletManagement(App):
         yield Header()
         with Vertical():
             yield VerticalScroll(id="chat_container")
-            yield Button("Create private key", id="create_private_key")
+            yield Button("Create private key", id="create_private_key_button")
             yield Input(placeholder="Enter Bitcoin Public Address", id="user_input")
         yield Footer()
 
@@ -54,7 +54,7 @@ class BtcWalletManagement(App):
         if event.button.id == "send_button":
             self.process_user_input()
 
-        if event.button.id == "create_private_key":
+        if event.button.id == "create_private_key_button":
             self.create_private_key()
 
     def add_message_to_chat(self, message: str, sender: str = "system") -> None:
@@ -110,11 +110,6 @@ class BtcWalletManagement(App):
             raise Exception(f"Request failed: {req_err}")
         except ValueError as json_err:
             raise Exception(f"Invalid response: {json_err}")
-
-    def update_balance_display(self, message: str) -> None:
-        """Update the balance display widget."""
-        balance_display = self.query_one("#balance_display", Static)
-        balance_display.update(message)
 
     def action_toogle_dark(self) -> None:
         """An action to toggle dark mode."""
